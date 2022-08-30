@@ -1,0 +1,5 @@
+urllib
+zlib
+hashlib
+scapy
+yara-python
