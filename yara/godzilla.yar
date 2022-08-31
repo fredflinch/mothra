@@ -1,6 +1,7 @@
 rule Godzilla_PHP_XOR_BASE64 {
 	meta:
 		description = "Godzilla shell -- PHP_XOR_BASE64 Mode"
+		author = "fredflinch"
 	strings:
 		$php = "<?php" ascii
 		$s0 = "@session_start();" ascii

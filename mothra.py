@@ -60,9 +60,17 @@ def decode_data(pcap, p, filters):
 
 ## TODO: saving creates a weird csv -- gotta fix
 def save_csv(outfile, cols):
-    with open(outfile, "w", newline="") as f:
-        writer = csv.writer(f, quoting=csv.QUOTE_NONE, escapechar='/', delimiter=',', quotechar='')
-        writer.writerows(cols)
+    if (len(cols[0]) - len(cols[1]) >= 0):
+        for x in range(0, (len(cols[0]) - len(cols[1]))):
+            cols[1].append('')
+    else:
+        for x in range(0, (len(cols[1]) - len(cols[0]))):
+            cols[0].append('')
+      
+    with open(outfile, "w", newline="\n") as f:
+        writer = csv.writer(f, quoting=csv.QUOTE_ALL, escapechar='\\', delimiter=',', quotechar='\"')
+        for x in range(0, len(cols[0])):
+            writer.writerow([cols[0][x], cols[1][x]])
 
 def auto_get_parser(match, parsers, shell):
     for key in parsers.keys():
@@ -100,7 +108,9 @@ if __name__=="__main__":
     elif ((args.infile is not None) and (args.mode=="parse") and (args.yaras is not None) and args.outfile is None):
         pcap = load_pcap(args.infile)
         decoder = search(args.yaras, pcap, True)
-        print(decode_data(pcap, decoder, None))
+        data = decode_data(pcap, decoder, None)
+        print(data)        
+
     elif ((args.infile is not None) and (args.mode=="parse") and (args.yaras is not None) and (args.outfile is not None)):
         pcap = load_pcap(args.infile)
         decoder = search(args.yaras, pcap, True)
