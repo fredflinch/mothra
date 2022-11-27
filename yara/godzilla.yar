@@ -18,6 +18,7 @@ rule inMEM_Godzilla_PHP_XOR_BASE64 {
 	strings:
 		$fname = "function run($pms){" ascii
 		$s0 = "(strlen(@trim($dir))>0)?trim($dir):str_replace('\\\\','/',dirname(__FILE__));" ascii
+		$s1 = "function getBasicsInfo()" ascii
 	condition:
 		all of them
 }
