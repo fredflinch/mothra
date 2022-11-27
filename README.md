@@ -18,6 +18,7 @@
 
 
 **To search process memory**
+
 `./mothra.py --pid <proc id of webserver/process to inspect> --yaras <path to .yar or yara directory> --mode memscan (OPTIONAL) --outfile <directory to dump proc mem>`
 
 ---
