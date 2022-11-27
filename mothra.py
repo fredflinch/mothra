@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from http.client import responses
 from scapy.all import *
 from scapy.layers.http import *
@@ -7,13 +9,13 @@ import argparse
 import glob 
 from parsers import *
 import csv
+from libs.memparser import parse_mem
 
 def load_pcap(pcap_file):
     pcap = rdpcap(pcap_file)    
     return pcap
 
-def search(yara_path, pcap, auto):
-    m = []
+def compile_yaras(yara_path):
     if ".yar" in yara_path:
         rules = [yara.compile(filepath=yara_path)]
     else: 
@@ -21,6 +23,11 @@ def search(yara_path, pcap, auto):
         yaras = glob.glob(yara_path+'/*.yar')
         for yar in yaras:
             rules.append(yara.compile(filepath=yar)) 
+    return rules
+
+def search(yara_path, pcap, auto):
+    m = []
+    rules = compile_yaras(yara_path)
     for packet in pcap:
         for rule in rules:
             matches = rule.match(data=raw(packet))
@@ -97,7 +104,9 @@ if __name__=="__main__":
     p.add_argument("-i", "--infile", help="Input PCAP file for analysis")
     p.add_argument("-o", "--outfile", help="Write the output to the file")
     p.add_argument("-y", "--yaras", help="Input yara file or directory of yara rules")
-    p.add_argument("-m", "--mode", help="Modes: search, parse")
+    p.add_argument("-m", "--mode", help="Modes: search, parse, memscan")
+    p.add_argument("--pid", help="Process ID of webserver to scan")
+
     args = p.parse_args()
     del p
     
@@ -115,5 +124,7 @@ if __name__=="__main__":
         pcap = load_pcap(args.infile)
         decoder = search(args.yaras, pcap, True)
         save_csv(args.outfile, decode_data(pcap, decoder, None))
+    elif((args.mode=="memscan") and args.pid and (args.yaras is not None)):
+        parse_mem(args.pid, compile_yaras(args.yaras), args.outfile)
     else:
         print("Error -- please see help with \'-h\'")
