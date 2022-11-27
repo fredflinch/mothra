@@ -18,10 +18,7 @@ class decoder():
             except: 
                 return 0
             if not (v is None or v==0): return v
-            else: return 0
-
-            
-        
+            else: return 0        
         if "200 OK" in data:
             if self.spec[0:16] in data:
                 try:
