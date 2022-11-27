@@ -25,6 +25,12 @@
   
 Mothra utilises pre-written YARA rules for identification of uploaded webshells and a module based decoding structure to allow for easy creation and integration of custom decoders for all sorts of webshells
 
-## currently supported webshells
+## Currently Supported Webshells
 - Godzilla in PHP mode B64 XOR mode
 
+---
+
+## TODO: 
+- Add YARA scan to filesystem for on-disk webshell identification
+- Extend HTTP mode scanning to support TLS/SSL given keys 
+- Add more webshells (particually the rest of the Godzilla suite)  
