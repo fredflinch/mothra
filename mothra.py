@@ -57,7 +57,7 @@ def decode_data(pcap, p, filters):
                     if v[0] == "resp": responses.append(v[1])
         else:
             if IP in packet and TCP in packet and HTTP in packet:
-                v = p.decode(raw(packet[HTTP].payload).decode('utf8'))
+                v = p.decode(raw(packet[HTTP].payload).decode('utf8', errors='ignore'))
                 if (v != 0):
                     if v[0] == "req":  requests.append(v[1])
                     if v[0] == "resp": responses.append(v[1])
