@@ -3,13 +3,10 @@
 from http.client import responses
 from scapy.all import *
 from scapy.layers.http import *
-import yara 
-import sys
-import argparse
-import glob 
+import yara, sys, argparse, glob, csv 
 from parsers import *
-import csv
 from libs.memparser import parse_mem
+
 
 def load_pcap(pcap_file):
     pcap = rdpcap(pcap_file)    
@@ -104,7 +101,10 @@ if __name__=="__main__":
     p.add_argument("-i", "--infile", help="Input PCAP file for analysis")
     p.add_argument("-o", "--outfile", help="Write the output to the file")
     p.add_argument("-y", "--yaras", help="Input yara file or directory of yara rules")
-    p.add_argument("-m", "--mode", help="Modes: search, parse, memscan")
+    p.add_argument("-m", "--mode", help="Modes: search, parse, memscan, deploy")
+    p.add_argument("--remoteaddr", help="Remote address to deploy mothraballs")
+    p.add_argument("--remoteport", help="Remote SSH port for deployment")
+    p.add_argument("-b", "--ball", help="Ball to deploy\nOptions: Basic, Install")
     p.add_argument("--pid", help="Process ID of webserver to scan")
 
     args = p.parse_args()
@@ -119,12 +119,16 @@ if __name__=="__main__":
         decoder = search(args.yaras, pcap, True)
         data = decode_data(pcap, decoder, None)
         print(data)        
-
     elif ((args.infile is not None) and (args.mode=="parse") and (args.yaras is not None) and (args.outfile is not None)):
         pcap = load_pcap(args.infile)
         decoder = search(args.yaras, pcap, True)
         save_csv(args.outfile, decode_data(pcap, decoder, None))
     elif((args.mode=="memscan") and args.pid and (args.yaras is not None)):
         parse_mem(args.pid, compile_yaras(args.yaras), args.outfile)
+    # TODO: ADD components for remote deploy 
+    elif((args.mode=="deploy") and (args.remoteaddr is not None) and (args.ball is not None)):
+        remotehost, sshport, ball = args.remoteaddr, 22, args.ball 
+        if (args.remoteport is not None): sshport = args.remoteport
+        pass
     else:
         print("Error -- please see help with \'-h\'")
