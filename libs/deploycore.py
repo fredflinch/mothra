@@ -40,7 +40,7 @@ def docompile(ball, arch, opsys='linux'):
     os.environ['GOOS'] = opsys
     os.environ['GOARCH'] = arch
     ## build command ##
-    buildcmd = "go build -o ./mothraballs/build/{arch}{plat}-{ball} ./motraballs/src/{ball}.go".format(ball=ball, arch=arch, plat=opsys)
+    buildcmd = "go build -o ./mothraballs/build/{arch}{plat}-{ball} ./mothraballs/src/{ball}.go".format(ball=ball, arch=arch, plat=opsys)
     p = subprocess.run(buildcmd)
     print(p.returncode)
 
