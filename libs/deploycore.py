@@ -38,6 +38,7 @@ class commandexec():
         _, stdout, _ = self.sshconn.exec_command(cmd)
         return stdout.read().decode().strip('\n')
 
+## TODO: add YARA push as well, plus any env setup for more complex deploys ##
 def autodeploy(ball, runop, host, user, auth, mode):
     execute = commandexec(host, user, auth, mode)
     arch = execute.runcmd('uname -m')

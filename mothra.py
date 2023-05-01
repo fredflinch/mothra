@@ -6,6 +6,7 @@ from scapy.layers.http import *
 import yara, sys, argparse, glob, csv 
 from parsers import *
 from libs.memparser import parse_mem
+from libs.deploycore import autodeploy
 
 
 def load_pcap(pcap_file):
@@ -104,7 +105,9 @@ if __name__=="__main__":
     p.add_argument("-m", "--mode", help="Modes: search, parse, memscan, deploy")
     p.add_argument("--remoteaddr", help="Remote address to deploy mothraballs")
     p.add_argument("--remoteport", help="Remote SSH port for deployment")
-    p.add_argument("-b", "--ball", help="Ball to deploy\nOptions: Basic, Install")
+    p.add_argument("--runops", help="Any options or modifiers to run mothraball with")
+    p.add_argument("--auth", help="auth in format user:pass OR user:keyfile")
+    p.add_argument("-b", "--ball", help="Ball to deploy\nOptions: scan, test")
     p.add_argument("--pid", help="Process ID of webserver to scan")
 
     args = p.parse_args()
@@ -125,10 +128,13 @@ if __name__=="__main__":
         save_csv(args.outfile, decode_data(pcap, decoder, None))
     elif((args.mode=="memscan") and args.pid and (args.yaras is not None)):
         parse_mem(args.pid, compile_yaras(args.yaras), args.outfile)
-    # TODO: ADD components for remote deploy 
     elif((args.mode=="deploy") and (args.remoteaddr is not None) and (args.ball is not None)):
         remotehost, sshport, ball = args.remoteaddr, 22, args.ball 
         if (args.remoteport is not None): sshport = args.remoteport
-        pass
+        user, authsnd = args.auth.split(":")[0], args.auth.split(":")[1]
+        if ('.pem' in authsnd): mode='key'
+        else: mode="password"
+        autodeploy(ball=ball, runop=args.runops, host=remotehost, user=user, auth=authsnd, mode=mode)
+        ## TODO: ADD Server start up for scan results - needed if shifting to velociraptor for remote deploy?##
     else:
         print("Error -- please see help with \'-h\'")
